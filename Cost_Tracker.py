@@ -20,7 +20,12 @@ def calculate_dish_cost(dish_name):
     total_cost = 0.0
 
     # Loop through each ingredient in the dish recipe
-    for ingredient_name, amount_str in dishes['stir fry noodles'].items():
+    recipe = dishes.get(dish_name)
+    if not recipe:
+        print(f"Warning: Dish '{dish_name}' not found in recipes.")
+        return 0.0
+
+    for ingredient_name, amount_str in recipe.items():
         ingredient_name = ingredient_name.lower()
 
         # Check if we have ingredient
@@ -52,7 +57,9 @@ def calculate_daily_expenses(day_orders):
     total_expenses = 0.0
 
     # Loop through each dish ordered that day
-    for dish_name, quantity in input_day_orders(day_orders).items():
+    valid_orders = input_day_orders(day_orders)
+
+    for dish_name, quantity in valid_orders.items():
 
         #Calculate cost of one serving
         dish_cost = calculate_dish_cost(dish_name)
@@ -70,7 +77,8 @@ def save_daily_orders_detailed_csv(date_str, day_orders, filename="daily_orders_
  #The arguments are the date in YYYY-MM-DD, the day_orders dictionary, and the name of the file we want to create
 
     # Calculate daily expenses
-    daily_expenses = calculate_daily_expenses(day_orders)
+    valid_orders = input_day_orders(day_orders)
+    daily_expenses = calculate_daily_expenses(valid_orders)
 
     # Check if file exists
     try:
@@ -89,7 +97,7 @@ def save_daily_orders_detailed_csv(date_str, day_orders, filename="daily_orders_
                            "Total_Cost_For_Dish", "Daily_Expenses"])
 
         # Write one row per dish with detailed cost breakdown
-        for dish_name, quantity in day_orders.items():
+        for dish_name, quantity in valid_orders.items():
             cost_per_dish = calculate_dish_cost(dish_name)  # Cost of one serving
             total_for_dish = cost_per_dish * quantity  # Total cost for this dish
 
